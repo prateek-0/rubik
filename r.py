@@ -136,7 +136,53 @@ for (c,d) in [ ("x", "R"), ("x'", "R'"), ("y", "U"), ("y'", "U'"), ("z", "F"), (
 	singm[c] = addl(singm[d], [-1,0,1])
 
 
-moves = input().split()
+
+
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument('base', type=str, help='base filename for output POV-Ray sources')
+parser.add_argument('-o', '--outf', type=str, dest='out', help='base filename for output images')
+parser.add_argument('script', type=str, help='output render script filename')
+parser.add_argument('-f', '--frames', type=int, dest='frames', default=16, help='number of frames per rotation')
+parser.add_argument('-W', '--width', type=int, dest='width', help='width in pixels')
+parser.add_argument('-H', '--height', type=int, dest='height', help='height in pixels')
+parser.add_argument('-p', '--povray-bin', type=str, dest='povbin', default='povray', help='POV-Ray executable')
+parser.add_argument('-m', '--moves', type=str, dest='moves', help='sequence of moves (can alternatively be provided on stdin)')
+parser.add_argument('-a', '--pov-options', type=str, dest='povoptions', default='+A +AM2 +R2', help='command-line options to POV-Ray')
+
+args = parser.parse_args()
+FR = args.frames
+assert(FR>=1)
+shflnm=args.script
+POVBIN=args.povbin
+basef=args.base
+outf=args.base+'.png'
+if args.out != None:
+	outf=args.out+'.png'
+
+def getWH(W,H):
+	import fractions
+	F = fractions.Fraction
+	if W==None and H==None:
+		return (960, 720)
+	if W==None:
+		assert(H>0)
+		W = max(1,round(H*F(4,3)))
+		return (W,H)
+	if H==None:
+		assert(W>0)
+		H = max(1,round(W*F(3,4)))
+		return (W,H)
+	assert(W > 0 and H > 0)
+	return (W,H)
+
+W, H = getWH(args.width, args.height)
+
+moves = args.moves
+if moves == None:
+	moves = input().split()
+else:
+	moves = moves.split()
 
 def resolve2(inp):
 	ans=[]
@@ -151,18 +197,15 @@ def resolve2(inp):
 
 moves=resolve2(moves)
 
+
 assert(all(m in singm.keys() for m in moves))
 
-FR=16
 TOTFR = len(moves)*FR
-basef='c'
-outf='c.png'
-shflnm='do.sh'
 
 
 baseframe = int('1' + (len(str(TOTFR)))*'0')
-POVOPT = '+W960 +H720 +A +AM2 +R2 -D'
-#POVOPT = '+W960 +H720 +Q1 -D'
+POVOPT = '+W{} +H{} {} -D'.format(W, H, args.povoptions)
+
 
 with open(shflnm, 'w') as script:
 	for (i,m) in enumerate(moves):
@@ -171,11 +214,7 @@ with open(shflnm, 'w') as script:
 			print('#include "cube_setup_scene.inc"')
 			rot_output(*singm[m])
 		if i != len(moves) - 1:
-			print('povray +I{} +O{} {} +KFI{} +KFF{} +KC'.format(flnm, outf, POVOPT, baseframe+i*FR, baseframe+(i+1)*FR-1), file=script)
+			print('{} +I{} +O{} {} +KFI{} +KFF{} +KC'.format(POVBIN, flnm, outf, POVOPT, baseframe+i*FR, baseframe+(i+1)*FR-1), file=script)
 		else: #special case for the last frame : the total number of frames is the total number of gaps between frame plus 1
-			print('povray +I{} +O{} {} +KFI{} +KFF{}'.format(flnm, outf, POVOPT, baseframe+i*FR, baseframe+(i+1)*FR), file=script)
+			print('{} +I{} +O{} {} +KFI{} +KFF{}'.format(POVBIN, flnm, outf, POVOPT, baseframe+i*FR, baseframe+(i+1)*FR), file=script)
 
-
-
-
-#rot_output(y, 1, [1])
