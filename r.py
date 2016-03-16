@@ -136,19 +136,21 @@ for (c,d) in [ ("x", "R"), ("x'", "R'"), ("y", "U"), ("y'", "U'"), ("z", "F"), (
 	singm[c] = addl(singm[d], [-1,0,1])
 
 
-
+DEFW=960
+DEFH=720
 
 import argparse
-parser = argparse.ArgumentParser()
+epilog='If only one of width and height is specified, the other is computed assuming a 4:3 aspect ratio. If neither is specified, the default is a width of {} and a height of {}.'.format(DEFW, DEFH)
+parser = argparse.ArgumentParser(epilog=epilog)
 parser.add_argument('base', type=str, help='base filename for output POV-Ray sources')
-parser.add_argument('-o', '--outf', type=str, dest='out', help='base filename for output images')
+parser.add_argument('-o', '--outf', type=str, dest='out', help='base filename for output images (default: same as base)')
 parser.add_argument('script', type=str, help='output render script filename')
-parser.add_argument('-f', '--frames', type=int, dest='frames', default=16, help='number of frames per rotation')
+parser.add_argument('-f', '--frames', type=int, dest='frames', default=16, help='number of frames per rotation (default: 16)')
 parser.add_argument('-W', '--width', type=int, dest='width', help='width in pixels')
 parser.add_argument('-H', '--height', type=int, dest='height', help='height in pixels')
 parser.add_argument('-p', '--povray-bin', type=str, dest='povbin', default='povray', help='POV-Ray executable')
 parser.add_argument('-m', '--moves', type=str, dest='moves', help='sequence of moves (can alternatively be provided on stdin)')
-parser.add_argument('-a', '--pov-options', type=str, dest='povoptions', default='+A +AM2 +R2', help='command-line options to POV-Ray')
+parser.add_argument('-a', '--pov-options', type=str, dest='povoptions', default='+A +AM2 +R2', help='command-line options to POV-Ray (default: +A +AM2 +R2)')
 
 args = parser.parse_args()
 FR = args.frames
@@ -164,7 +166,7 @@ def getWH(W,H):
 	import fractions
 	F = fractions.Fraction
 	if W==None and H==None:
-		return (960, 720)
+		return (DEFW, DEFH)
 	if W==None:
 		assert(H>0)
 		W = max(1,round(H*F(4,3)))
