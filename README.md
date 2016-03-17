@@ -6,4 +6,4 @@ Run `r.py` in an empty directory (this is preferable since it creates several fi
 The frames can be combined into a video using a separate tool, such as [ffmpeg](https://www.ffmpeg.org/) or [avconv](https://libav.org/).
 
 ## Singmaster notation
-Currently supports FBUDLR, corresponding two-layer moves (both f,b,etc and Fw,Bw,etc), whole cube rotations (x,y,z), and inverses of all the above. Also supports 180-degree rotations (F2, f2, Fw2, x2, etc).
+Currently supports FBUDLR, corresponding two-layer moves (both f,b,etc and Fw,Bw,etc), whole cube rotations (x,y,z), middle-layer rotations (MES), and inverses of all the above. Also supports 180-degree rotations (F2, f2, Fw2, x2, M2, etc).

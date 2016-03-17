@@ -134,6 +134,9 @@ for k in [q for q in singm.keys()]:
 #Whole-cube rotations:
 for (c,d) in [ ("x", "R"), ("x'", "R'"), ("y", "U"), ("y'", "U'"), ("z", "F"), ("z'", "F'")]:
 	singm[c] = addl(singm[d], [-1,0,1])
+#Middle-layer rotations:
+for (c,d) in [ ("M", "L"), ("M'", "L'"), ("E", "D"), ("E'", "D'"), ("S", "F"), ("S'", "F'")]:
+	singm[c] = addl(singm[d], [0])
 
 
 DEFW=960
